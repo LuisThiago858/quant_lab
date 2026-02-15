@@ -95,6 +95,7 @@ def save_raw_parquet(df: pd.DataFrame, symbol: str, tf_label:str) -> Path:
 
     return out_path
 
+
 if __name__ == "__main__":
     symbol = "BTCUSDT"
     interval = Client.KLINE_INTERVAL_1HOUR
