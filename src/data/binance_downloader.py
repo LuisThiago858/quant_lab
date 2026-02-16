@@ -90,7 +90,7 @@ def save_raw_parquet(df: pd.DataFrame, symbol: str, tf_label:str) -> Path:
     out_dir = Path("data/raw")
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    out_path = out_dir / f"{"symbol"}_{tf_label}.parquet"
+    out_path = out_dir / f"{symbol}_{tf_label}.parquet"
     df.to_parquet(out_path, engine="pyarrow")
 
     return out_path
