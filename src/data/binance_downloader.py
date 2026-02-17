@@ -83,6 +83,101 @@ def download_klines(
 
     return df
 
+def interval_to_timedelta(intrval: str) -> pd.Timedelta:
+    """"
+    Converter intervalos padrão da Binance para Timedelta, cobrindo os intervalos mais comuns:
+    """
+    mapping = {
+        Client.KLINE_INTERVAL_1MINUTE: "1min",
+        Client.KLINE_INTERVAL_3MINUTE: "3min",
+        Client.KLINE_INTERVAL_5MINUTE: "5min",
+        Client.KLINE_INTERVAL_15MINUTE: "15min",
+        Client.KLINE_INTERVAL_30MINUTE: "30min",
+        Client.KLINE_INTERVAL_1HOUR: "1h",
+        Client.KLINE_INTERVAL_2HOUR: "2h",
+        Client.KLINE_INTERVAL_4HOUR: "4h",
+        Client.KLINE_INTERVAL_6HOUR: "6h",
+        Client.KLINE_INTERVAL_8HOUR: "8h",
+        Client.KLINE_INTERVAL_12HOUR: "12h",
+        Client.KLINE_INTERVAL_1DAY: "1d",
+    }
+
+    if interval not in mapping:
+        raise ValueError(f"Intervalo não suportado no mapping: {interval}")
+    return pd.Timedelta(mapping[interval])
+
+def raw_parquet_path(symbol: str, tf_label: str)-> Path:
+    """
+    Retorna o caminho do arquivo parquet para um símbolo e intervalo de tempo específico, em data/raw/<symbol>_<tf>.parquet
+    """
+    return Path("data/raw") / f"{symbol}_{tf_label}.parquet"
+
+def load_existing_parquet(path: Path) -> pd.DataFrame:
+    """
+    Carrega um arquivo parquet existente e retorna um DataFrame limpo, com index DatetimeIndex, ordenado por tempo e sem duplicações."""
+    df = pd.read_parquet(path)
+
+    if not isinstance(df.index, pd.DatetimeIndex):
+        raise ValueError(f"Dataset salvo não esta com DatetimeIndex.")
+    df = df.sort_index()
+    df = df[~df.index.duplicated(keep="last")]
+
+    return df
+
+def merge_and_clean(old_df: pd.DataFrame, new_df: pd.Dataframe) -> pd.DataFrame:
+    df = pd.concat([old_df, new_df], axis=0)
+    df = df[~df.index.duplicated(keep="last")].sort_index()
+    df = df.dropna(subset=["close"])
+    df = df[df["close"]>0]
+    return df
+
+def update_dataset(
+    symbol: str,
+    interval: str,
+    tf_label: str,
+    start_str_if_missing: str,
+    end_str: str | None = None,
+)-> tuple[pd.DataFrame, Path]:
+    """
+    Se o parquet existe
+    - carrega
+    - pega o ultimo timestamp
+    - baixa do proximo candle em diante
+    - concat + dedup + ordena
+    - salva
+
+    Se o parquet não existe
+    - baixa tudo a partir de start_str_if_missing
+    - salva
+    """
+    out_dir = Path("data/raw")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    path = raw_parquet_path(symbol, tf_label)
+
+    if path.exists():
+        old_df = load_existing_parquet(path)
+        last_ts = old_df.index.max()
+        step = interval_to_timedelta(interval)
+        next_start = last_ts + step
+
+        start_str = next_start.strftime("%Y-%m-%d %H:%M:%S UTC")
+
+        new_df = download_klines(symbol, interval, start_str, end_str=end_str)
+
+        if new_df.empty or new_df.index.max() <= last_ts:
+            return old_df, path
+        
+        merged = merge_and_clean(old_df, new_df)
+        merged.to_parquet(path, engine="pyarrow")
+        return merged, path
+    
+    #se não existe, baixa tudo a partir de start_str_if_missing e salva
+    df = download_klines(symbol, interval, start_str_if_missing, end_str=end_str)
+    df.to_parquet(path, engine="pyarrow")
+
+    return df, path
+
+
 def save_raw_parquet(df: pd.DataFrame, symbol: str, tf_label:str) -> Path:
     """
     Salva o DataFrame em formato parquet, em data/raw/<symbol>_<tf>.parquet
@@ -102,13 +197,20 @@ if __name__ == "__main__":
     tf_label = "1h"
     start_str = "2 years ago UTC"
 
-    df = download_klines(symbol, interval, start_str)
+    #df = download_klines(symbol, interval, start_str)
     #eu recomendo usar o data wrangler extensão do VS Code para visualizar os dados baixados, para ter uma ideia melhor 
     # do que foi obtido e verificar se está tudo certo antes de salvar em parquet. O data wrangler
     # é uma ferramenta de visualização de dados que pode ser muito útil para explorar e entender os dados baixados.
-    out = save_raw_parquet(df, symbol, tf_label)
+    #out = save_raw_parquet(df, symbol, tf_label)
+    df, path = update_dataset(
+        symbol=symbol,
+        interval=interval,
+        tf_label=tf_label,
+        start_str_if_missing=start_str,
+        end_str=None,
+    )
 
-    print(f" Salvo: {out} ({len(df):,} linhas)")
-    print(df.head(3)[["open", "high", "low", "close", "volume"]])
+    print(f" Salvo: {path} ({len(df):,} linhas)")
+    print("ultimas 3 linhas:")
     print(df.tail(3)[["open", "high", "low", "close", "volume"]])
 
