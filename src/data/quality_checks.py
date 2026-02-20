@@ -38,6 +38,7 @@ def quality_report(df: pd.DataFrame, tf_delta: pd.Timedelta) -> tuple[str, pd.Da
     is_monotonic = df.index.is_monotonic_increasing
     lines.append(f"Index monotonic increasing: {is_monotonic}")
 
+    #o backtest compra no futuro e vende no passado
     if not is_monotonic:
         lines.append(" -> AVISO: índice fora de ordem (vai ordenar no merge/bactest)")
     
