@@ -1,4 +1,5 @@
 .venv
 __pycache__
-data/processed
-data/raw
+BTCUSDT_1h_features.parquet
+quality_report_BTCUSDT_1h.txt
+BTCUSDT_1h.parquet
