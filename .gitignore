@@ -1,5 +1,12 @@
-.venv
-__pycache__
-BTCUSDT_1h_features.parquet
-quality_report_BTCUSDT_1h.txt
-BTCUSDT_1h.parquet
+.venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+
+# Ignorar arquivos gerados (mas manter as pastas)
+data/raw/*
+data/processed/*
+
+# Permitir placeholders para versionar as pastas
+!data/raw/.gitkeep
+!data/processed/.gitkeep
