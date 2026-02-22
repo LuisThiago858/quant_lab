@@ -124,20 +124,21 @@ pip install -r requirements.txt
 ## ▶️ Como Executar
 
 ### Baixar parquet historico de BTCUSDT
+
 ``` bash
 python -m src.data.binance_downloader
-```
-
-### Gerar/atualizar dataset com features
-
-``` bash
-python -m src.data.build_features
 ```
 
 ### Verifica a qualidade dos dados gerados, criando um relatorio atualizado, e uma visão geral da quantidade de missing data
 
 ``` bash
 python -m src.data.quality_checks
+```
+
+### Gerar/atualizar dataset com features
+
+``` bash
+python -m src.data.build_features
 ```
 
 ### Carrega o arquivo de features em Parquet de um símbolo/timeframe e valida se o dataset está no formato certo (índice de tempo e colunas obrigatórias) para usar no backtest.
