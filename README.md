@@ -123,6 +123,11 @@ pip install -r requirements.txt
 
 ## ▶️ Como Executar
 
+### Baixar parquet historico de BTCUSDT
+``` bash
+python -m src.data.binance_downloader
+```
+
 ### Gerar/atualizar dataset com features
 
 ``` bash
