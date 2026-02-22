@@ -103,7 +103,7 @@ cd quant_lab
 
 ``` powershell
 python -m venv .venv
-.\\.venv\\Scripts\\activate
+.\.venv\Scripts\Activate.ps1 
 ```
 
 **Linux/Mac**
