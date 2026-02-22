@@ -134,6 +134,18 @@ python -m src.data.binance_downloader
 python -m src.data.build_features
 ```
 
+### Verifica a qualidade dos dados gerados, criando um relatorio atualizado, e uma visão geral da quantidade de missing data
+
+``` bash
+python -m src.data.quality_checks
+```
+
+### Carrega o arquivo de features em Parquet de um símbolo/timeframe e valida se o dataset está no formato certo (índice de tempo e colunas obrigatórias) para usar no backtest.
+
+``` bash
+python -m src.data.datasets
+```
+
 Isso irá: 1. Baixar dados faltantes da Binance 2. Validar qualidade 3.
 Construir features 4. Salvar o dataset processado
 
