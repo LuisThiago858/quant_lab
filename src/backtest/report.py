@@ -23,7 +23,7 @@ def main():
 
     #Estrategia sem custo e com cuwsto
     res_nocost = run_backtest_long_only(df_signal, initial_capital = initial, fee_rate=0.0, slippage=0.0)
-    res_cost = run_backtest_long_only(df_signal, initial_capital=initial, fee_rate=0.0001, slippage=0.00002)
+    res_cost = run_backtest_long_only(df_signal, initial_capital=initial, fee_rate=0.001, slippage=0.0002)
 
     met_nocost = compute_metrics(res_nocost.equity, res_nocost.returns)
     met_cost = compute_metrics(res_cost.equity, res_cost.returns)

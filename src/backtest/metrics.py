@@ -31,7 +31,7 @@ def shape_ratio(returns: pd.Series, periodos_por_ano: int = 8760) -> float:
     
     return (returns.mean()/std) * np.sqrt(periodos_por_ano)
 
-def max_drawdon(equity: pd.Series)-> tuple[float, pd.Timestamp | None, pd.Timestamp | None]:
+def max_drawdown(equity: pd.Series)-> tuple[float, pd.Timestamp | None, pd.Timestamp | None]:
     """"
     Max Drawdown a partir da equity curve:
         Drawdown = equity / running_max - 1
@@ -47,9 +47,9 @@ def max_drawdon(equity: pd.Series)-> tuple[float, pd.Timestamp | None, pd.Timest
 
     drawdon = equity_value / running_max - 1.0
 
-    max_drawdon_value = drawdon.min()
+    max_drawdown_value = drawdon.min()
 
-    end = drawdon.idxmin() if not np.isnan(max_drawdon_value) else None
+    end = drawdon.idxmin() if not np.isnan(max_drawdown_value) else None
 
     if end is None:
         return float("nan"), None, None
@@ -57,7 +57,7 @@ def max_drawdon(equity: pd.Series)-> tuple[float, pd.Timestamp | None, pd.Timest
     #start = ponto do pico antes do vale
 
     start = equity_value.loc[:end].idxmax()
-    return float (max_drawdon_value), start, end
+    return float (max_drawdown_value), start, end
 
 
 def cagr(equity: pd.Series, periodos_por_ano: int = 8760) -> float:
@@ -91,7 +91,7 @@ def compute_metrics(
     s =  shape_ratio(returns, periodos_por_ano=periodos_por_ano)
     g = cagr(equity, periodos_por_ano=periodos_por_ano)
 
-    mdd, start, end = max_drawdon(equity)
+    mdd, start, end = max_drawdown(equity)
 
     return Metrics(shape=s, cagr=g, max_drawdown=mdd, max_drawdown_start=start, max_drawdown_end=end)
 

@@ -121,7 +121,7 @@ pip install -r requirements.txt
 
 ------------------------------------------------------------------------
 
-## ▶️ Como Executar
+## ▶️ Como Executar Semana 1
 
 ### Baixar parquet historico de BTCUSDT
 
@@ -149,6 +149,44 @@ python -m src.data.datasets
 
 Isso irá: 1. Baixar dados faltantes da Binance 2. Validar qualidade 3.
 Construir features 4. Salvar o dataset processado
+
+## ▶️ Como Executar Semana 2
+
+### Módulo de estratégia de SMA Cross (O cruzamento da Média Móvel Simples) que só gera sinais (não executa ordens de compra).
+
+``` bash
+python -m src.strategies.sma_cross
+```
+
+### Executar o motor de backtest vetorizado com pandas, já utilizando retorno e posições gerados no passo anterior, e utilizando um capital inicial e retornando o capital final.
+
+``` bash
+python -m src.backtest.engine
+```
+
+### Executar o módulo metricas que recebe uma equity curve e/ou retornos e devolve Sharpe, Max Drawdown e CAGR.
+
+``` bash
+python -m src.backtest.metrics
+```
+
+### Gerar um mini report com gráfico entre as estratégias com custo e sem custo do SMA e Buy & Hold
+
+``` bash
+python -m src.backtest.report
+```
+
+### Testar estrategias de SMA como periodos de curto e longo prazo diferentes
+``` bash
+python -m src.experiments.sma_grid_search
+```
+
+### Executar código testa várias configurações da estratégia em dados passados (treino), escolhe a melhor e depois verifica como ela se comporta em dados futuros (teste). Isso ajuda a ver se a estratégia realmente funciona fora da amostra e reduz o risco de overfitting.
+
+``` bash
+python -m src.experiments.walkforward_sma
+```
+
 
 ------------------------------------------------------------------------
 
