@@ -25,6 +25,12 @@ estatística**, não apenas previsão de preço.
 ## 🧱 Estrutura do Projeto
 
     quant_lab/
+    ├─ data/
+    │  ├─ raw/                       # dados brutos (parquet)
+    │  └─ processed/                 # datasets com features (parquet)
+    ├─ notebooks/
+    │  ├─ backtest/                  # teste com taxas e sem taxas
+    │  └─ strategies/                # estrategias
     ├─ src/
     │  ├─ data/
     │  │  ├─ binance_downloader.py   # download histórico via API da Binance
@@ -34,9 +40,6 @@ estatística**, não apenas previsão de preço.
     │  └─ utils/
     │     └─ paths.py                # caminhos padronizados do projeto
     │
-    ├─ data/
-    │  ├─ raw/                       # dados brutos (parquet)
-    │  └─ processed/                 # datasets com features (parquet)
     │
     ├─ notebooks/                    # análises exploratórias (EDA)
     ├─ requirements.txt
@@ -186,7 +189,43 @@ python -m src.experiments.sma_grid_search
 ``` bash
 python -m src.experiments.walkforward_sma
 ```
+## ▶️ Como Executar Semana 3
 
+### Executar simulação de Monte Carlo / Bootstrap para avaliar a distribuição de Sharpe, CAGR e Drawdown da estratégia a partir de reamostragens dos retornos históricos.
+
+``` bash
+python -m src.analysis.monte_carlo_bootstrap
+```
+
+### Gerar um relatório textual de robustez com intervalos de confiança (p05, p50 e p95) a partir dos resultados do bootstrap.
+
+``` bash
+python -m src.analysis.bootstrap_report
+```
+
+### Avaliar a estabilidade dos parâmetros da estratégia SMA em uma grade de combinações próximas e gerar um heatmap de Sharpe para identificar regiões mais robustas.
+
+``` bash
+python -m src.experiments.parameter_stability
+```
+
+### Executar validação rolling walk-forward com múltiplas janelas móveis, recalibrando a melhor configuração no treino e validando no teste subsequente.
+
+``` bash
+python -m src.experiments.rolling_walkforward
+```
+
+### Estimar a Probability of Backtest Overfitting (PBO) de forma prática, verificando com que frequência a melhor estratégia do treino cai para posições ruins no ranking do teste.
+
+``` bash
+python -m src.analysis.pbo_estimation
+```
+
+### Comparar a estratégia SMA com Buy & Hold e com estratégias aleatórias calibradas por turnover, para avaliar se a estratégia supera o acaso de forma consistente.
+
+``` bash
+python -m src.analysis.random_baseline
+```
 
 ------------------------------------------------------------------------
 
